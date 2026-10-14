@@ -1,0 +1,46 @@
+# ==========================================
+# Backup Repository .gitignore
+# Safe for public GitHub release
+# ==========================================
+
+# Local backup output & metadata
+data/
+.bck/
+
+# Machine-specific request configurations (contain absolute local paths & user secrets)
+request.json
+request*.json
+!request.json.example
+!request.schema.json
+!docs/machine-migration-request.json
+
+# Environment variables & credentials
+.env
+.env.*
+!.env.example
+*.token
+*.pem
+*.key
+*.pfx
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+
+# Editor & OS artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Local storage pointer (symlink to drive) and leftover variants
+/data
+request.json.orig

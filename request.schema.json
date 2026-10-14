@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/bck/request.schema.json",
+  "title": "bck backup request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["backup_name", "require_elevation", "sources", "files", "environment", "archive", "delivery"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "backup_name": { "type": "string", "minLength": 1 },
+    "require_elevation": { "type": "boolean" },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/fileTarget" }
+    },
+    "environment": { "$ref": "#/$defs/environment" },
+    "notes": { "$ref": "#/$defs/notes" },
+    "git_state": { "$ref": "#/$defs/git_state" },
+    "restore": { "$ref": "#/$defs/restore" },
+    "symlinks": { "$ref": "#/$defs/symlinks" },
+    "archive": { "$ref": "#/$defs/archive" },
+    "delivery": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/delivery" }
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "path", "enabled", "respect_gitignore", "follow_symlinks"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "enabled": { "type": "boolean" },
+        "respect_gitignore": { "type": "boolean" },
+        "follow_symlinks": { "type": "boolean" },
+        "include_git": {
+          "type": "boolean",
+          "description": "When true, **/.git/** excludes are dropped for this source and git objects are backed up. Default false: history is re-created at the receiver from git-state.json."
+        },
+        "include": { "$ref": "#/$defs/stringArray" },
+        "exclude": { "$ref": "#/$defs/stringArray" },
+        "force_include": {
+          "$ref": "#/$defs/stringArray",
+          "description": "Glob paths included even when ignored by Git; explicit exclude still wins."
+        },
+        "path_regex_include": {
+          "$ref": "#/$defs/stringArray",
+          "description": "At least one regular expression must match the source-relative POSIX path."
+        },
+        "path_regex_exclude": {
+          "$ref": "#/$defs/stringArray",
+          "description": "Reject a file when any regular expression matches its relative path."
+        },
+        "content_regex_include": {
+          "$ref": "#/$defs/stringArray",
+          "description": "At least one regular expression must match decoded file content."
+        },
+        "content_regex_exclude": {
+          "$ref": "#/$defs/stringArray",
+          "description": "Reject a file when any regular expression matches decoded content."
+        },
+        "content_encoding": { "type": "string", "default": "utf-8" }
+      }
+    },
+    "fileTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "path", "enabled", "required"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "enabled": { "type": "boolean" },
+        "required": { "type": "boolean" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "include_all", "names", "prefixes", "include_regex", "exclude", "exclude_regex", "redaction_enabled", "redact", "redact_regex"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "include_all": { "type": "boolean" },
+        "names": { "$ref": "#/$defs/stringArray" },
+        "prefixes": { "$ref": "#/$defs/stringArray" },
+        "include_regex": { "$ref": "#/$defs/stringArray" },
+        "exclude": { "$ref": "#/$defs/stringArray" },
+        "exclude_regex": { "$ref": "#/$defs/stringArray" },
+        "redaction_enabled": {
+          "type": "boolean",
+          "description": "When false, redact and redact_regex are ignored and selected values are stored verbatim."
+        },
+        "redact": { "$ref": "#/$defs/stringArray" },
+        "redact_regex": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "symlinks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Record symlink inventory (link -> target) for serve display. Links are never archived as items. Default false."
+        }
+      }
+    },
+    "git_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Record git identity (remotes, branches, HEAD, ahead/behind) per repo; objects stay excluded unless source include_git is true."
+        }
+      }
+    },
+    "restore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_aliases"],
+      "properties": {
+        "path_aliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" }
+            }
+          },
+          "description": "Longest-prefix rewrites applied to restore destinations (e.g. /mnt/devspace -> D:/data). CLI --map FROM=TO adds more."
+        }
+      }
+    },
+    "notes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "include_software", "include_path", "custom", "capture_commands"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "include_software": {
+          "type": "boolean",
+          "description": "Record installed-software digest (package counts, dev tools, PATH executables)."
+        },
+        "include_path": {
+          "type": "boolean",
+          "description": "Record PATH directories and their existence."
+        },
+        "custom": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Operator-supplied non-transferrable facts (reinstall steps, license locations)."
+        },
+        "capture_commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Shell commands whose stdout is captured into notes (60s timeout each, 20KB cap)."
+        }
+      }
+    },
+    "encryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "method", "passphrase_from", "keyring_service", "keyring_user"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "method": { "const": "7z-aes", "description": "WinZip AES-256 via 7z -mem=AES256. Only method." },
+        "passphrase_from": { "enum": ["prompt", "env", "keyring"] },
+        "keyring_service": { "type": "string" },
+        "keyring_user": { "type": "string" }
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,      "required": ["compression_level", "workers", "staging_mode", "checksum", "keep_last", "fail_on_unreadable"],
+      "properties": {
+        "compression_level": { "type": "integer", "minimum": 0, "maximum": 9 },
+        "workers": { "type": "integer", "minimum": 0 },
+        "staging_mode": { "enum": ["copy", "auto", "hardlink"] },
+        "checksum": { "type": "boolean" },
+        "keep_last": { "type": "integer", "minimum": 0 },
+        "fail_on_unreadable": { "type": "boolean" },
+        "encryption": { "$ref": "#/$defs/encryption" }
+      }
+    },
+    "delivery": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "enabled", "destination", "include_checksum"],
+          "properties": {
+            "type": { "const": "copy" },
+            "enabled": { "type": "boolean" },
+            "destination": { "type": "string", "minLength": 1 },
+            "include_checksum": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "enabled", "destination", "include_checksum", "args"],
+          "properties": {
+            "type": { "const": "rclone" },
+            "enabled": { "type": "boolean" },
+            "destination": { "type": "string", "minLength": 1 },
+            "include_checksum": { "type": "boolean" },
+            "args": { "$ref": "#/$defs/stringArray" }
+          }
+        }
+      ]
+    }
+  }
+}

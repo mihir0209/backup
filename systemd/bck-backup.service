@@ -1,0 +1,12 @@
+[Unit]
+Description=Versioned machine backup (bck)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Unattended: passphrase cannot prompt here — use passphrase_from=env/keyring
+# (BACKUP_PASSPHRASE via EnvironmentFile, or --store-passphrase beforehand).
+WorkingDirectory=%h/backup
+ExecStart=/usr/bin/python3 %h/backup/backup.py --request %h/backup/docs/machine-migration-request.json
+EnvironmentFile=-%h/backup/.env

@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily versioned machine backup (bck)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=30m
+Unit=bck-backup.service
+
+[Install]
+WantedBy=timers.target

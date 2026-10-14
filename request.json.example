@@ -1,0 +1,114 @@
+{
+  "$schema": "./request.schema.json",
+  "backup_name": "machine-backup",
+  "require_elevation": true,
+  "sources": [
+    {
+      "name": "projects",
+      "path": "~/Projects",
+      "enabled": false,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include_git": false,
+      "include": ["**"],
+      "exclude": ["**/.git/**", "**/*.tmp"],
+      "force_include": [
+        ".env",
+        ".env.local",
+        ".env.production",
+        "**/.env",
+        "**/.env.local",
+        "**/.env.production"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "selected-text-files",
+      "path": "~/Documents",
+      "enabled": false,
+      "respect_gitignore": false,
+      "follow_symlinks": true,
+      "include": ["**"],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": ["(?i)(notes|journal).*\\.(md|txt)$"],
+      "path_regex_exclude": ["(^|/)archive/"],
+      "content_regex_include": ["(?i)important|backup"],
+      "content_regex_exclude": ["(?i)do[ -]?not[ -]?backup"],
+      "content_encoding": "utf-8"
+    }
+  ],
+  "files": [
+    {
+      "name": "shell-config",
+      "path": "~/.zshrc",
+      "enabled": false,
+      "required": false
+    },
+    {
+      "name": "compose-files",
+      "path": "~/Projects/**/compose.y*ml",
+      "enabled": false,
+      "required": false
+    }
+  ],
+  "environment": {
+    "enabled": false,
+    "include_all": false,
+    "names": ["PATH", "SHELL", "LANG"],
+    "prefixes": ["APP_"],
+    "include_regex": ["^(LC_|XDG_)"],
+    "exclude": ["*_TEMP"],
+    "exclude_regex": ["^INTERNAL_"],
+    "redaction_enabled": true,
+    "redact": ["*TOKEN*", "*SECRET*", "*PASSWORD*", "*KEY*"],
+    "redact_regex": ["(?i)(auth|cookie|credential|key|password|private|secret|session|token)"]
+  },
+  "notes": {
+    "enabled": false,
+    "include_software": true,
+    "include_path": true,
+    "custom": [],
+    "capture_commands": ["python3 -m pip freeze", "npm list -g --depth=0"]
+  },
+  "git_state": {
+    "enabled": false
+  },
+  "restore": {
+    "path_aliases": []
+  },
+  "archive": {
+    "compression_level": 6,
+    "workers": 0,
+    "staging_mode": "copy",
+    "checksum": true,
+    "keep_last": 10,
+    "fail_on_unreadable": true,
+    "encryption": {
+      "enabled": false,
+      "method": "7z-aes",
+      "passphrase_from": "prompt",
+      "keyring_service": "bck-backup",
+      "keyring_user": ""
+    }
+  },
+  "delivery": [
+    {
+      "type": "copy",
+      "enabled": false,
+      "destination": "${BACKUP_COPY_TARGET}",
+      "include_checksum": true
+    },
+    {
+      "type": "rclone",
+      "enabled": false,
+      "destination": "${GDRIVE_REMOTE}",
+      "include_checksum": true,
+      "args": ["--transfers", "4", "--checkers", "8", "--progress"]
+    }
+  ]
+}

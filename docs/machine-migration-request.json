@@ -1,0 +1,1624 @@
+{
+  "$schema": "./request.schema.json",
+  "backup_name": "full-machine-ssd-migration",
+  "require_elevation": true,
+  "sources": [
+    {
+      "name": "home-projects",
+      "path": "~/Projects",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-projects",
+      "path": "/mnt/devspace/Projects",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/data/services/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-trade-plus",
+      "path": "/mnt/devspace/trade_plus",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/.dbdata/**",
+        "**/.dbgate/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-kiro-bot",
+      "path": "/mnt/devspace/Kiro_Bot_V8_Final_E2E",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/output*/**",
+        "**/docker-output/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-home-data",
+      "path": "/mnt/devspace/home-data",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/cache/**",
+        "**/*.sock",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-anchor-backup",
+      "path": "~/Anchor-backup",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-anchor-licenses",
+      "path": "~/anchor-licenses",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-documents",
+      "path": "~/Documents",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/node_modules/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-desktop",
+      "path": "~/Desktop",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-pictures",
+      "path": "~/Pictures",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-secrets",
+      "path": "~/Secrets",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-opencode-work",
+      "path": "~/opencode",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-forge-backup",
+      "path": "~/forge_backup",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-forge-backup-offhost",
+      "path": "~/forge_backup_offhost",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-dsalearn",
+      "path": "~/dsalearn",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-sdlearn",
+      "path": "~/sdlearn",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-yamllearn",
+      "path": "~/yamllearn",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-web-service",
+      "path": "~/web-service",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-wdpassport-utils",
+      "path": "~/wdpassport-utils",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-medical-bills",
+      "path": "/mnt/devspace/Medical_Remaining_Bills",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-anchor-intake",
+      "path": "/mnt/devspace/anchor-intake-timing",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.ruff_cache/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "shared-drive-docs",
+      "path": "/mnt/shared",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "$RECYCLE.BIN/**",
+        "System Volume Information/**",
+        "**/.git/**",
+        "**/node_modules/**",
+        "Backups/**",
+        "bck-tmp/**"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*",
+        "bitwarden_export_*.json",
+        "passwords.csv",
+        "Microsoft Edge Passwords.csv"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "user-config",
+      "path": "~/.config",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/google-chrome*/**",
+        "**/BraveSoftware/**",
+        "**/chromium/**",
+        "**/browseruse/**",
+        "**/dconf/**",
+        "**/evolution/**",
+        "**/gtk*/**",
+        "**/haruna/**",
+        "**/ibus/**",
+        "**/Cache/**",
+        "**/GPUCache/**",
+        "**/Code/Cache*/**",
+        "**/Code/CachedData/**",
+        "**/Code/User/workspaceStorage/**",
+        "**/*.sock"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "agent-skills-config",
+      "path": "~/.agents",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "claude-config",
+      "path": "~/.claude",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/sessions/**",
+        "**/backups/**",
+        "plugins/**",
+        "session-env/**",
+        ".credentials.json",
+        "mcp-needs-auth-cache.json"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "opencode-config",
+      "path": "~/.opencode",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/node_modules/**",
+        "bin/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "user-credentials-ssh",
+      "path": "~/.ssh",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "user-credentials-kube",
+      "path": "~/.kube",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/cache/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "system-etc-configs",
+      "path": "/etc",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "fstab",
+        "hosts",
+        "environment",
+        "netplan/**",
+        "docker/**",
+        "systemd/system/*.service",
+        "systemd/system/*.timer",
+        "systemd/system/*.d/**"
+      ],
+      "exclude": [
+        "systemd/system/snap*"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "gemini-config",
+      "path": "~/.gemini",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "antigravity-cli/conversations/**",
+        "antigravity-cli/conversation_summaries.db",
+        "antigravity-cli/history.jsonl",
+        "antigravity-cli/annotations/**",
+        "antigravity-cli/brain/**/*.md",
+        "antigravity-cli/brain/**/*.metadata.json",
+        "antigravity/conversations/**",
+        "antigravity/conversation_summaries.db",
+        "antigravity/annotations/**",
+        "antigravity/brain/**/*.md",
+        "antigravity/brain/**/*.metadata.json",
+        "antigravity-backup/**",
+        "antigravity-ide/**",
+        "config/**",
+        "skills/**",
+        "rules/**",
+        "commands/**",
+        "GEMINI.md"
+      ],
+      "exclude": [
+        "**/installation_id",
+        "**/*state.pbtxt",
+        "**/last_check.timestamp",
+        "**/knowledge.lock"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "codex-config",
+      "path": "~/.codex",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "cline-config",
+      "path": "~/.cline",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "data/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "cursor-config",
+      "path": "~/.cursor",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "roo-config",
+      "path": "~/.roo",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "qwen-config",
+      "path": "~/.qwen",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "kiro-config",
+      "path": "~/.kiro",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "copilot-config",
+      "path": "~/.copilot",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "session-state/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "codeium-config",
+      "path": "~/.codeium",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "aider-desk-config",
+      "path": "~/.aider-desk",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "tinyfish-config",
+      "path": "~/.tinyfish",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "tokenade-config",
+      "path": "~/.tokenade",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "sessions/**",
+        "logs/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "kaggle-config",
+      "path": "~/.kaggle",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "bitfun-config",
+      "path": "~/.bitfun",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "wrangler-config",
+      "path": "~/.wrangler",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "logs/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "docker-config",
+      "path": "~/.docker",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "openclaw-config",
+      "path": "~/.openclaw",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "antideploy-config",
+      "path": "~/.antideploy",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "dsh-config",
+      "path": "~/.dsh",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "ai-engine-config",
+      "path": "~/.ai-engine",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "parsec-config",
+      "path": "~/.parsec",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "bin/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "t3-config",
+      "path": "~/.t3",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "userdata/**"
+      ],
+      "exclude": [
+        "tools/**",
+        "runtime/**",
+        "caches/**",
+        "scratch/**",
+        "userdata/logs/**",
+        "userdata/secrets/**",
+        "userdata/clerk-tokens.json",
+        "userdata/**/clerk-tokens.json",
+        "userdata/providers/**",
+        "userdata/device/**",
+        "userdata/server-runtime.json",
+        "userdata/environment-id"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-downloads-selective",
+      "path": "~/Downloads",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "Medical_bills*/**",
+        "Medical_bills/**",
+        "Stock/**",
+        "**/*.pdf",
+        "**/*.anchor-backup"
+      ],
+      "exclude": [
+        "**/*.pem",
+        "**/*secret*",
+        "**/*recovery*",
+        "**/*.mp4",
+        "browser-use-mcp/**",
+        "**/*.zip"
+      ],
+      "force_include": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*"
+      ],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-backup-tool",
+      "path": "~/backup",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**",
+        "data/**",
+        ".bck/**",
+        "**/data/**",
+        "**/.bck/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-ohmyzsh-custom",
+      "path": "~/.oh-my-zsh/custom",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "vscode-config",
+      "path": "~/.vscode",
+      "enabled": true,
+      "respect_gitignore": false,
+      "follow_symlinks": false,
+      "include": [
+        "rules/**",
+        "argv.json"
+      ],
+      "exclude": [],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-devops",
+      "path": "~/devops",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "home-dockerlearn",
+      "path": "~/dockerlearn",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "**"
+      ],
+      "exclude": [
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/target/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/.ruff_cache/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    },
+    {
+      "name": "devspace-opencode-db",
+      "path": "/mnt/devspace/local-share",
+      "enabled": true,
+      "respect_gitignore": true,
+      "follow_symlinks": false,
+      "include": [
+        "opencode/opencode.db",
+        "opencode/opencode-local.db"
+      ],
+      "exclude": [
+        "**/auth*.json",
+        "**/mcp-auth.json",
+        "**/*.zst",
+        "**/*-wal",
+        "**/*-shm",
+        "**/log/**",
+        "**/snapshot/**",
+        "**/repos/**"
+      ],
+      "force_include": [],
+      "path_regex_include": [],
+      "path_regex_exclude": [],
+      "content_regex_include": [],
+      "content_regex_exclude": [],
+      "content_encoding": "utf-8"
+    }
+  ],
+  "files": [
+    {
+      "name": "shell-zshrc",
+      "path": "~/.zshrc",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-bashrc",
+      "path": "~/.bashrc",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-profile",
+      "path": "~/.profile",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "git-config",
+      "path": "~/.gitconfig",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "rclone-config",
+      "path": "~/.config/rclone/rclone.conf",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "claude-json",
+      "path": "~/.claude.json",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-root-env",
+      "path": "~/.env",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-python-scripts",
+      "path": "~/*.py",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "anchor-request",
+      "path": "~/anchor-request.json",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-keeper-9router-cleanup",
+      "path": "~/9router-model-cleanup.py",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-keeper-azure-models",
+      "path": "~/azure_deployed_models.json",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-keeper-azure-foundry-report",
+      "path": "~/azure_foundry_deploy_report.json",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-keeper-idea-caching",
+      "path": "~/idea_on_prompt_caching.md",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "home-keeper-checklive",
+      "path": "~/checklive.md",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-zshenv",
+      "path": "~/.zshenv",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-p10k",
+      "path": "~/.p10k.zsh",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-tmux",
+      "path": "~/.tmux.conf",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-inputrc",
+      "path": "~/.inputrc",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "shell-zprofile",
+      "path": "~/.zprofile",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "devspace-anchor-sqlite",
+      "path": "/mnt/devspace/*.sqlite3",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "devspace-archive-medical",
+      "path": "/mnt/devspace/Medical_Remaining_Bills.zip",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "devspace-archive-tradeplus",
+      "path": "/mnt/devspace/trade_plus_2108_221230.zip",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "devspace-anchor-license",
+      "path": "/mnt/devspace/anchor-license.json",
+      "enabled": true,
+      "required": false
+    },
+    {
+      "name": "devspace-root-photos",
+      "path": "/mnt/devspace/*.jpg",
+      "enabled": true,
+      "required": false
+    }
+  ],
+  "environment": {
+    "enabled": true,
+    "include_all": true,
+    "names": [],
+    "prefixes": [],
+    "include_regex": [],
+    "exclude": [],
+    "exclude_regex": [],
+    "redaction_enabled": false,
+    "redact": [],
+    "redact_regex": []
+  },
+  "archive": {
+    "compression_level": 6,
+    "workers": 0,
+    "staging_mode": "copy",
+    "checksum": true,
+    "keep_last": 10,
+    "fail_on_unreadable": false,
+    "encryption": {
+      "enabled": true,
+      "method": "7z-aes",
+      "passphrase_from": "keyring",
+      "keyring_service": "bck-backup",
+      "keyring_user": ""
+    }
+  },
+  "delivery": [
+    {
+      "type": "rclone",
+      "enabled": false,
+      "destination": "${GDRIVE_REMOTE}",
+      "include_checksum": true,
+      "args": [
+        "--transfers",
+        "4",
+        "--checkers",
+        "8",
+        "--progress"
+      ]
+    },
+    {
+      "type": "copy",
+      "enabled": false,
+      "destination": "/mnt/shared/Backups",
+      "include_checksum": true
+    }
+  ],
+  "notes": {
+    "enabled": true,
+    "include_software": true,
+    "include_path": true,
+    "custom": [
+      "Machine-bound app data intentionally NOT archived (reinstall apps, do not transfer): ~/.local/share/com.anchor.pharmacy.modern, ~/.local/share/com.saviour.erp",
+      "/mnt/devspace root files captured via files[] globs (no tree walk over docker/devtools): *.sqlite3, Medical+trade_plus zips, anchor-license.json, *.jpg"
+    ],
+    "capture_commands": [
+      "python3 -m pip freeze",
+      "npm list -g --depth=0",
+      "cargo install --list"
+    ]
+  },
+  "git_state": {
+    "enabled": true
+  },
+  "restore": {
+    "path_aliases": []
+  },
+  "symlinks": {
+    "enabled": false
+  }
+}
