@@ -1967,6 +1967,40 @@ def _apply_path_aliases(dest: str, extra: list[str]) -> str:
     return dest
 
 
+def _describe_restore_dest(dest: str, dest_path: Path) -> str:
+    """Render a restore destination for messages: mapped path, plus the
+    archived original when aliasing rewrote it."""
+    mapped = str(dest_path)
+    return mapped if mapped == dest else f"{mapped} (archived as {dest})"
+
+
+def _restore_label_roots(tree: dict[str, str], extra: list[str]) -> dict[str, str]:
+    """Mapped common destination root per archive label for restore summaries.
+
+    Never raises: unmappable destinations (e.g. /mnt/* on Windows without a
+    --map) are reported inline so even dry-run surfaces the exact fix instead
+    of failing mid-restore.
+    """
+    roots: dict[str, list[str]] = {}
+    for ap, dest in tree.items():
+        label = ap.split("/")[1] if "/" in ap else ap
+        try:
+            roots.setdefault(label, []).append(_apply_path_aliases(dest, extra))
+        except RuntimeError as error:
+            roots.setdefault(label, []).append(f"UNMAPPED ({error})")
+    out: dict[str, str] = {}
+    for label, dests in roots.items():
+        clean = [d for d in dests if not d.startswith("UNMAPPED")]
+        if not clean:
+            out[label] = dests[0]
+            continue
+        try:
+            out[label] = os.path.commonpath(clean)
+        except ValueError:
+            out[label] = os.path.dirname(clean[0])
+    return out
+
+
 def do_restore(args: argparse.Namespace) -> int:
     import tempfile
     import zipfile
@@ -1991,8 +2025,9 @@ def do_restore(args: argparse.Namespace) -> int:
     # dry-run summary
     if args.dry_run and not encrypted:
         print(f"Would restore {len(tree)} files from {archive.name}")
+        roots = _restore_label_roots(tree, args.map)
         for label, count in sorted(groups.items()):
-            print(f"  {label}: {count} files -> ...")
+            print(f"  {label}: {count} files -> {roots.get(label, '...')}")
         if manifest.get("version"):
             print(f"  version: v{manifest['version']:06d}  id: {manifest.get('backup_id','')}")
         return 0
@@ -2026,8 +2061,9 @@ def do_restore(args: argparse.Namespace) -> int:
                 groups[ap.split("/")[1] if "/" in ap else ap] += 1
             if args.dry_run:
                 print(f"Would restore {len(tree)} files from {archive.name}")
+                roots = _restore_label_roots(tree, args.map)
                 for label, count in sorted(groups.items()):
-                    print(f"  {label}: {count} files -> ...")
+                    print(f"  {label}: {count} files -> {roots.get(label, '...')}")
                 if manifest.get("version"):
                     print(f"  version: v{manifest['version']:06d}  id: {manifest.get('backup_id','')}")
                 return 0
@@ -2050,21 +2086,22 @@ def do_restore(args: argparse.Namespace) -> int:
             try:
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
             except Exception as e:
-                errors.append(f"{dest}: mkdir failed: {e}")
+                errors.append(f"{_describe_restore_dest(dest, dest_path)}: mkdir failed: {e}")
                 continue
             if dest_path.exists() and not args.force:
-                errors.append(f"exists (use --force to overwrite): {dest}")
+                errors.append(f"exists (use --force to overwrite): {_describe_restore_dest(dest, dest_path)}")
                 continue
             try:
                 shutil.copy2(staged, dest_path)
                 restored += 1
             except Exception as e:
-                errors.append(f"{dest}: write failed: {e}")
+                errors.append(f"{_describe_restore_dest(dest, dest_path)}: write failed: {e}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     # per-directory summary
+    roots = _restore_label_roots(tree, args.map)
     for label, count in sorted(groups.items()):
-        print(f"  {label}: {count} files")
+        print(f"  {label}: {count} files -> {roots.get(label, '...')}")
     print(f"Restored: {restored}/{len(tree)} files")
     if errors:
         print("Errors:", file=sys.stderr)
