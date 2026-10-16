@@ -1955,10 +1955,14 @@ def _apply_path_aliases(dest: str, extra: list[str]) -> str:
             frm, to = raw.split("=", 1)
             if frm and to:
                 aliases.append((frm, to))
+    # Separator-insensitive compare: "\" -> "/" is 1:1, so offsets hold for
+    # splicing the ORIGINAL dest (Linux archives store "/", Windows "\\",
+    # and os.path.commonpath may emit either form). `to` keeps user spelling.
+    norm_dest = dest.replace("\\", "/")
     for frm, to in sorted(aliases, key=lambda pair: -len(pair[0])):
-        if dest.startswith(frm):
+        if norm_dest.startswith(frm.replace("\\", "/")):
             return to + dest[len(frm):]
-    if os.name == "nt" and (dest == "/mnt" or dest.startswith("/mnt/")):
+    if os.name == "nt" and (norm_dest == "/mnt" or norm_dest.startswith("/mnt/")):
         raise RuntimeError(
             f"Cannot restore Linux mount path {dest!r} on Windows without a mapping; "
             "pass --map /mnt/<name>=<Letter>:/... (e.g. --map /mnt/devspace=D:/data) "
@@ -2080,7 +2084,11 @@ def do_restore(args: argparse.Namespace) -> int:
         for ap, dest in tree.items():
             staged = tmp / Path(*PurePosixPath(ap).parts)
             if not staged.is_file():
-                errors.append(f"missing in archive: {ap}")
+                try:
+                    want = _apply_path_aliases(dest, args.map)
+                except RuntimeError:
+                    want = dest
+                errors.append(f"missing in archive: {ap} (destined for {want})")
                 continue
             dest_path = Path(_apply_path_aliases(dest, args.map))
             try:
@@ -2372,8 +2380,28 @@ def do_serve_report(args: argparse.Namespace) -> int:
     ]
     targets = sorted({str(r["p"]).split("/")[1] for r in rows if "/" in str(r["p"])})
     symlinks = snapshot.get("symlink_inventory", {}) or {}
-    page = _render_report_html(REQUEST_SLUG, snapshot, versions, rows, targets, symlinks)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if getattr(args, "format", "html") == "json":
+        changes = snapshot.get("changes", {}) or {}
+        payload = {
+            "tool": "backup.py", "mode": "report", "slug": REQUEST_SLUG,
+            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "version": snapshot.get("version"),
+            "backup_id": snapshot.get("backup_id"),
+            "created_at": snapshot.get("created_at"),
+            "archive": snapshot.get("archive"),
+            "file_count": len(rows),
+            "bytes_total": sum(int(r["b"]) for r in rows),
+            "changes": {k: len(changes.get(k, [])) for k in ("added", "modified", "deleted")},
+            "targets": targets,
+            "symlink_counts": {
+                name: (info or {}).get("count", 0) for name, info in symlinks.items()
+            },
+            "rows": rows,
+        }
+        _emit_json(DATA_DIR / f"{REQUEST_SLUG}-report.json", payload)
+        return 0
+    page = _render_report_html(REQUEST_SLUG, snapshot, versions, rows, targets, symlinks)
     output = DATA_DIR / f"{REQUEST_SLUG}-report.html"
     output.write_text(page, encoding="utf-8")
     print(f"Report: {output} ({len(rows)} files, v{snapshot.get('version', 0):06d})")
@@ -2554,13 +2582,32 @@ render();
 
 
 def do_serve_plan(args: argparse.Namespace) -> int:
-    print("Enumerating targets for plan view (can take a few minutes on full requests)...", flush=True)
+    print("Enumerating targets for plan view (can take a few minutes on full requests)...",
+          flush=True, file=sys.stderr)
     only = set(args.only)
     rows, warnings = _plan_stats(only)
     total_files = sum(r["file_count"] for r in rows)
     total_bytes = sum(r["bytes"] for r in rows)
-    page = _render_plan_html(REQUEST_SLUG, rows, warnings, CONFIG, total_files, total_bytes)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if getattr(args, "format", "html") == "json":
+        enabled = [r["name"] for r in rows if r["enabled"]]
+        payload = {
+            "tool": "backup.py", "mode": "plan", "slug": REQUEST_SLUG,
+            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "totals": {
+                "targets": len(rows), "files": total_files, "bytes": total_bytes,
+            },
+            "targets": rows,
+            "warnings": warnings,
+            "suggested_only_command": (
+                "python backup.py " + " ".join(f"--only {n}" for n in enabled)
+            ),
+        }
+        _emit_json(DATA_DIR / f"{REQUEST_SLUG}-plan.json", payload)
+        for warning in warnings:
+            print(f"WARNING: {warning}", file=sys.stderr)
+        return 0
+    page = _render_plan_html(REQUEST_SLUG, rows, warnings, CONFIG, total_files, total_bytes)
     output = DATA_DIR / f"{REQUEST_SLUG}-plan.html"
     output.write_text(page, encoding="utf-8")
     print(f"Plan: {output} ({len(rows)} targets, {total_files:,} files, {total_bytes:,} bytes)")
@@ -2824,11 +2871,28 @@ render();
 """
 
 
-def do_serve_load(args: argparse.Namespace) -> int:
-    archive = _resolve_archive(args)
-    tree, manifest, notes, software, encrypted = _load_meta_for_load(args, archive)
-    if not tree:
-        raise RuntimeError(f"No restorable files found in {archive}")
+def _emit_json(output: Path, payload: dict[str, Any]) -> None:
+    """Write a machine-readable serve document for agents.
+
+    The file is the reviewable artifact (same basename as the HTML view);
+    the identical document goes to stdout so agents need no browser, while
+    the file path goes to stderr to keep stdout pure JSON.
+    """
+    output.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    print(f"Wrote: {output}", file=sys.stderr)
+    print(json.dumps(payload, ensure_ascii=True))
+
+
+def _load_targets(
+    tree: dict[str, str], manifest: dict[str, Any], extra_maps: list[str]
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Per-target extraction roots for `serve load`, shared by HTML and JSON.
+
+    Returns (targets, aliases): targets carry {label, kind, files, orig,
+    proposed, symlinks, unmapped}; aliases holds only changed rows
+    (from != to), longest-prefix matching applied — the same list the HTML
+    download button writes into request.load.json.
+    """
     groups: dict[str, dict[str, Any]] = {}
     for archive_path, source in sorted(tree.items()):
         parts = PurePosixPath(archive_path).parts
@@ -2846,14 +2910,126 @@ def do_serve_load(args: argparse.Namespace) -> int:
         except ValueError:
             orig = os.path.dirname(entry["srcs"][0])
         try:
-            proposed = _apply_path_aliases(orig, args.map)
-        except RuntimeError:
-            proposed = orig  # unmapped (e.g. /mnt on Windows): human maps it in the page
+            proposed = _apply_path_aliases(orig, extra_maps)
+            unmapped: str | None = None
+        except RuntimeError as error:
+            proposed = orig  # unmapped (e.g. /mnt on Windows): human maps it
+            unmapped = str(error)
         targets.append({
             "label": label, "kind": entry["kind"], "files": entry["files"],
             "orig": orig, "proposed": proposed,
             "symlinks": sym_inv.get(label, {}).get("count", 0),
+            "unmapped": unmapped,
         })
+    aliases = [
+        {"from": t["orig"], "to": t["proposed"]}
+        for t in targets if t["proposed"] != t["orig"]
+    ]
+    # A few mapped dests per target so agents can verify the fast-path
+    # precondition (every dest under an alias) without the full tree.
+    by_label: dict[str, list[str]] = {}
+    for archive_path, source in sorted(tree.items()):
+        parts = PurePosixPath(archive_path).parts
+        label = parts[1] if len(parts) > 1 else parts[0]
+        by_label.setdefault(label, []).append(source)
+    for target in targets:
+        samples = []
+        for dest in by_label.get(target["label"], [])[:3]:
+            try:
+                samples.append(_apply_path_aliases(dest, extra_maps))
+            except RuntimeError:
+                samples.append(dest)
+        target["dest_samples"] = samples
+    return targets, aliases
+
+
+def _build_load_payload(
+    tree: dict[str, str],
+    manifest: dict[str, Any],
+    notes: dict[str, Any],
+    software: dict[str, Any],
+    encrypted: bool,
+    archive: Path,
+    targets: list[dict[str, Any]],
+    aliases: list[dict[str, str]],
+    request_doc: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Assemble the machine-readable load plan (pure function, no I/O).
+
+    Returns (payload, request_load_doc): the agent-facing plan plus a
+    ready-to-use request file (request + changed aliases) identical to what
+    the HTML view's download button produces.
+    """
+    dev_tools = sorted((software.get("developer_tools", {}) or {}).keys())
+    exes_all = [
+        e.get("name", "") for e in (software.get("user_path_executables", {}) or []) or []
+        if isinstance(e, dict) and e.get("name")
+    ]
+    desk_all = [
+        a.get("name", "") for a in (software.get("desktop_applications", {}) or []) or []
+        if isinstance(a, dict) and a.get("name")
+    ]
+    syscounts = {
+        manager: len(packages)
+        for manager, packages in (software.get("system_packages", {}) or {}).items()
+    }
+    custom = (
+        list(notes.get("custom", []))
+        if isinstance(notes.get("custom"), list) else []
+    )
+    base_cmd = f"python {Path(__file__).name} --restore --archive {archive.resolve()}"
+    for row in aliases:
+        base_cmd += f" --map {row['from']}={row['to']}"
+    sidecar = archive.with_name(archive.name + ".sha256")
+    payload = {
+        "tool": "backup.py", "mode": "load", "slug": REQUEST_SLUG,
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "archive": {
+            "name": archive.name, "path": str(archive.resolve()),
+            "sha256_sidecar": str(sidecar) if sidecar.is_file() else None,
+        },
+        "version": manifest.get("version"),
+        "backup_id": manifest.get("backup_id"),
+        "created_at": manifest.get("created_at"),
+        "encrypted": encrypted,
+        "file_count": len(tree),
+        "targets": targets,
+        "aliases": aliases,
+        "unmapped_targets": [t["label"] for t in targets if t["unmapped"]],
+        "command_dry_run": base_cmd + " --dry-run",
+        "command_live": base_cmd,
+        "notes_custom": custom,
+        "apps": {
+            "developer_tools": dev_tools,
+            "user_path_executables_sample": exes_all[:20],
+            "user_path_executable_count": len(exes_all),
+            "desktop_applications_sample": desk_all[:20],
+            "desktop_application_count": len(desk_all),
+            "system_package_counts": syscounts,
+        },
+        "brief": "\n".join([
+            "LOAD BRIEF (generated; paths are tool-derived, review aliases before live restore)",
+            f"archive: {archive.resolve()}",
+            f"command: {base_cmd} --dry-run",
+            "",
+            "targets:",
+            *[f"- {t['orig']}  ->  {t['proposed']}" for t in targets],
+            "",
+            "apps to install (ordered):",
+            *[f"- {n}" for n in sorted(dev_tools)],
+        ]),
+    }
+    request_load = json.loads(json.dumps(request_doc, ensure_ascii=True))
+    request_load.setdefault("restore", {})["path_aliases"] = aliases
+    return payload, request_load
+
+
+def do_serve_load(args: argparse.Namespace) -> int:
+    archive = _resolve_archive(args)
+    tree, manifest, notes, software, encrypted = _load_meta_for_load(args, archive)
+    if not tree:
+        raise RuntimeError(f"No restorable files found in {archive}")
+    targets, aliases = _load_targets(tree, manifest, args.map)
     dev_tools = sorted((software.get("developer_tools", {}) or {}).keys())
     exes_all = [
         e.get("name", "") for e in (software.get("user_path_executables", {}) or []) or []
@@ -2875,6 +3051,18 @@ def do_serve_load(args: argparse.Namespace) -> int:
         CONFIG,
     )
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if getattr(args, "format", "html") == "json":
+        payload, request_load = _build_load_payload(
+            tree, manifest, notes, software, encrypted, archive,
+            targets, aliases, CONFIG,
+        )
+        request_load_file = DATA_DIR / "request.load.json"
+        request_load_file.write_text(
+            json.dumps(request_load, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+        )
+        payload["request_load_file"] = str(request_load_file)
+        _emit_json(DATA_DIR / f"{REQUEST_SLUG}-load.json", payload)
+        return 0
     output = DATA_DIR / f"{REQUEST_SLUG}-load.html"
     output.write_text(page, encoding="utf-8")
     print(f"Load: {output} ({len(targets)} targets, {len(tree)} files)")
@@ -2887,7 +3075,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--request",
         type=Path,
         default=DEFAULT_REQUEST,
-        help="request JSON file (default: request.json beside this script)",
+        help="request JSON file (default: request.json beside this script). Required for backup/restore/serve/list-targets/list-versions; --list-slugs and --store-passphrase work without it.",
     )
     parser.add_argument(
         "--only",
@@ -2911,7 +3099,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--serve", nargs="?", const="report", default=None, choices=["report", "plan", "load"], metavar="MODE", help="serve MODE and open it in the default browser: report (backup contents), plan (live request planner), or load (extraction-time mapping planner). Bare --serve means report.")
     parser.add_argument("--serve-port", type=int, default=None, help="with --serve, also serve the report over HTTP on this port")
     parser.add_argument("--no-browser", action="store_true", help="with --serve, do not auto-open the browser")
-    parser.add_argument("--store-passphrase", action="store_true", help="prompt twice and store the archive passphrase in the OS keyring (no backup runs)")
+    parser.add_argument("--format", choices=["html", "json"], default="html", help="with --serve: human HTML page (default) or machine-readable JSON document on stdout (same data, file also written). Agents should prefer json.")
+    parser.add_argument("--store-passphrase", action="store_true", help="prompt twice and store the archive passphrase in the OS keyring (no backup runs; needs no request file unless the request customizes keyring_service/user)")
     parser.add_argument("--map", action="append", default=[], metavar="FROM=TO", help="rewrite restore destination prefix (repeatable); e.g. --map /mnt/devspace=D:/data. Combines with restore.path_aliases, longest prefix wins.")
     parser.add_argument("--archive", type=Path, help="zip archive to restore (default: latest in data/<slug>/)")
     parser.add_argument("--version", type=str, help="version to restore, e.g. v000001 or 1")
@@ -2981,11 +3170,49 @@ def show_slugs() -> None:
         print(f"  {slug}  hash={info.get('hash','?')[:12]}  backup_name={info.get('backup_name','?')}  versions={count} zips={zcount}")
 
 
+def _load_request_for_keyring(args: argparse.Namespace) -> None:
+    """Set CONFIG for --store-passphrase without demanding a request file.
+
+    Honors a custom keyring_service/user when a request file is available
+    (explicit --request, else a default request.json beside the script);
+    otherwise falls back to defaults (service bck-backup, user = hostname),
+    which match a default request anyway.
+    """
+    global CONFIG
+    request_path = args.request
+    if not request_path.is_absolute():
+        request_path = (Path.cwd() / request_path).resolve()
+    if request_path.is_file():
+        if args.request != DEFAULT_REQUEST:
+            CONFIG = load_request(request_path)
+        else:
+            try:
+                CONFIG = load_request(request_path)
+            except ValueError:
+                # A broken default request must not block storing a
+                # passphrase: fall back to default keyring identity.
+                CONFIG = {}
+    elif args.request != DEFAULT_REQUEST:
+        raise FileNotFoundError(
+            f"Request file not found: {request_path}."
+        )
+    else:
+        CONFIG = {}
+
+
 def main(argv: list[str] | None = None) -> int:
     global CONFIG
 
     argv = list(sys.argv[1:] if argv is None else argv)
     args = parse_args(argv)
+    if args.list_slugs:
+        # No request needed: reads the slug map + filesystem only.
+        show_slugs()
+        return 0
+    if args.store_passphrase:
+        # No request needed unless keyring identity is customized in it.
+        _load_request_for_keyring(args)
+        return do_store_passphrase(args)
     request_path = args.request
     if not request_path.is_absolute():
         request_path = (Path.cwd() / request_path).resolve()
@@ -3005,9 +3232,6 @@ def main(argv: list[str] | None = None) -> int:
         INDEX_FILE = BCK_DIR / "index.json"
         HISTORY_FILE = BCK_DIR / "history.jsonl"
         LOCK_FILE = BCK_DIR / "lock"
-    if args.list_slugs:
-        show_slugs()
-        return 0
     # restore does not require 7z for extraction (stdlib), but check if available for info
     if args.restore:
         request_elevation(argv, request_path)
@@ -3017,8 +3241,6 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.serve:
         return do_serve(args)
-    if args.store_passphrase:
-        return do_store_passphrase(args)
     seven_zip = check_all_dependencies(CONFIG)
     if args.list_targets:
         show_targets()
